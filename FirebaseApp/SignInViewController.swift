@@ -6,10 +6,14 @@
 //
 
 import UIKit
+import FirebaseCore
 import FirebaseAuth
+import GoogleSignIn
+
+
 
 class SignInViewController: UIViewController {
-
+    
     @IBOutlet weak var usernametf: UITextField!
     
     @IBOutlet weak var passwordtf: UITextField!
@@ -18,7 +22,7 @@ class SignInViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
-
+    
     @IBAction func signUp(_ sender: Any) {
         
         let username = usernametf.text ?? ""
@@ -61,8 +65,29 @@ class SignInViewController: UIViewController {
         }
     }
     
-    func goToHome () {
-        self.performSegue(withIdentifier:"goToHome", sender: nil)
+    @IBAction func signWithGoogle(_ sender: Any) {
+        // Configure Google SignIn with Firebase
+        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
+        // Create Google Sign In configuration object.
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+        
+        // Start the sign in flow!
+        GIDSignIn.sharedInstance.signIn(withPresenting: self) { [unowned self] result, error in
+            guard error == nil else {
+                print(error!)
+                return
+            }
+            guard let user = result?.user, let idToken = user.idToken?.tokenString else {
+                print("Cannot get user token from Google")
+                return
+            }
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: user.accessToken.tokenString)
+        }
     }
-}
+        
+        func goToHome () {
+            self.performSegue(withIdentifier:"goToHome", sender: nil)
+        }
+    }
 
