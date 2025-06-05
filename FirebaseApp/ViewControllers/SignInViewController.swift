@@ -9,6 +9,7 @@ import UIKit
 import FirebaseCore
 import FirebaseAuth
 import GoogleSignIn
+import FirebaseFirestore
 
 
 
@@ -38,11 +39,35 @@ class SignInViewController: UIViewController {
             } else {
                 // Todo correcto
                 print("User signs up successfully")
-                let alertController = UIAlertController(title: "Create user", message: "User signs up successfully", preferredStyle: .alert)
-                alertController.addAction(UIAlertAction(title: "OK", style: .default))
-                self.present(alertController, animated: true, completion: nil)
+                createUser()
+                
             }
         }
+    }
+    
+    func createUser() {
+        let userID = Auth.auth().currentUser?.uid
+        let username = usernametf.text!
+        let password = passwordtf.text!
+        let firstName
+        let lastName
+        let gender
+        let birthday
+        
+        
+        
+        User(id: <#T##String#>, username: <#T##String#>, firstName: <#T##String#>, lastName: <#T##String#>, gender: <#T##Gender#>, birthday: <#T##Date#>, provider: <#T##LoginProvider#>)
+        
+        do {
+            let db = Firestore.firestore()
+            try db.collection("Users").document(userID).setData(from: user)
+            let alertController = UIAlertController(title: "Create user", message: "User signs up successfully", preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alertController, animated: true, completion: nil)
+        } catch let error {
+          print("Error writing city to Firestore: \(error)")
+        }
+
     }
     
     @IBAction func signIn(_ sender: Any) {
@@ -83,6 +108,44 @@ class SignInViewController: UIViewController {
                 return
             }
             let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: user.accessToken.tokenString)
+            
+            Auth.auth().signIn(with: credential) { [unowned self] result, error in
+                if let error = error {
+                    // Hubo un error
+                    print(error)
+                    
+                    let alertController = UIAlertController(title: "Sign In", message: error.localizedDescription, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alertController, animated: true, completion: nil)
+                } else {
+                    // Todo correcto
+                    print("User signs in successfully")
+                    
+                    //user signed in - Task
+                    
+                    goToHome()
+                }
+            }
+        }
+    }
+    
+    @IBAction func githubLogin(_ sender: Any) {
+        let provider = OAuthProvider(providerID: "github.com")
+        provider.scopes = ["user:email"]
+        provider.getCredentialWith(nil) { credential, error in
+            if let error = error {
+                print("Error obteniendo credenciales de GitHub: \(error.localizedDescription)")
+                return
+            }
+            if let credential = credential {
+                Auth.auth().signIn(with: credential) { authResult, error in
+                    if let error = error {
+                        print("Error al iniciar sesión con GitHub: \(error.localizedDescription)")
+                    } else {
+                        print("Sesión iniciada con éxito: \(authResult?.user.uid ?? "")")
+                    }
+                }
+            }
         }
     }
         

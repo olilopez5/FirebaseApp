@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseAuth
+import FirebaseFirestore
 
 class HomeViewController: UIViewController {
 
@@ -14,6 +15,21 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        let db = Firestore.firestore()
+        let userID = Auth.auth().currentUser!.uid
+        let docRef = db.collection("Users").document(userID)
+
+        Task {
+            do {
+              let user = try await docRef.getDocument(as: User.self)
+              print("User: \(user)")
+            } catch {
+              print("Error decoding user: \(error)")
+            }
+        }
+        
+        
     }
     
 
