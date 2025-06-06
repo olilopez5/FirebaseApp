@@ -15,6 +15,7 @@ struct User: Codable {
     var gender: Gender
     var birthday: Date?
     var provider: LoginProvider
+    var profileImageUrl: String?
     
 }
 
@@ -22,10 +23,11 @@ enum Gender: String, Codable {
     case male
     case female
     case other
-    case unespecified
+    case unspecified
 }
 
 enum LoginProvider: String, Codable {
+    case basic
     case google
     case github
     case facebook

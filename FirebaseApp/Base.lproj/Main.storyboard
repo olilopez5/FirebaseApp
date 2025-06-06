@@ -269,6 +269,9 @@
                                                     <segment title="Female"/>
                                                     <segment title="Other"/>
                                                 </segments>
+                                                <connections>
+                                                    <action selector="genderSegmentedControl:" destination="o9w-kI-Ijk" eventType="valueChanged" id="BWF-Ff-sXN"/>
+                                                </connections>
                                             </segmentedControl>
                                         </subviews>
                                         <color key="backgroundColor" red="0.52156865600000002" green="0.59215688710000003" blue="0.97254902119999997" alpha="0.31573365066225167" colorSpace="custom" customColorSpace="displayP3"/>
